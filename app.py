@@ -77,12 +77,13 @@ def receber_sinal(id_ordem):
         FROTA[id_ordem]['ultimo_visto'] = datetime.now().strftime("%H:%M:%S")
         return jsonify({"ok": True}), 200
     return jsonify({"ok": False}), 404
-
+""" 
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port)
-"""  
+ """  
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 10000))
     app.run(host='0.0.0.0', port=port)
-"""   
+ 
+
