@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Central de Monitoramento</title>
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <style>
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            margin: 0; 
+            display: flex; 
+            height: 100vh; 
+            background: #f0f2f5; 
+        }
+        
+        /* --- Barra Lateral --- */
+        #sidebar { 
+            width: 350px; 
+            background: white; 
+            padding: 20px; 
+            border-right: 1px solid #ccc; 
+            overflow-y: auto; 
+            box-shadow: 2px 0 5px rgba(0,0,0,0.05); 
+            display: flex;
+            flex-direction: column;
+        }
+        
+        #mapa { flex: 1; height: 100%; }
+        
+        h2 { color: #1a237e; font-size: 18px; margin-top: 0; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        h3 { font-size: 16px; color: #333; margin-top: 20px; }
+
+        /* --- Formulário --- */
+        .form-control { margin-bottom: 15px; }
+        label { display: block; font-size: 12px; font-weight: bold; color: #555; margin-bottom: 5px; }
+        input { 
+            width: 100%; 
+            padding: 10px; 
+            border: 1px solid #ddd; 
+            border-radius: 5px; 
+            box-sizing: border-box; 
+            font-size: 14px;
+        }
+        
+        button.btn-gerar { 
+            background: #1a237e; 
+            color: white; 
+            width: 100%; 
+            padding: 12px; 
+            border: none; 
+            border-radius: 5px; 
+            cursor: pointer; 
+            font-weight: bold; 
+            transition: 0.2s;
+        }
+        button.btn-gerar:hover { background: #0d47a1; }
+
+        /* --- Cartões da Frota --- */
+        .card { 
+            background: #fff; 
+            border: 1px solid #e0e0e0; 
+            border-radius: 8px; 
+            padding: 15px; 
+            margin-top: 15px; 
+            border-left: 5px solid #999; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        .card.ativo { 
+            border-left-color: #00c853; /* Verde quando em trânsito */
+            background: #f1f8e9; 
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: bold;
+            text-transform: uppercase;
+            background: #eee;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .card.ativo .status-badge {
+            background: #c8e6c9;
+            color: #2e7d32;
+        }
+
+        /* --- Área do Link --- */
+        .link-area { 
+            font-size: 11px; 
+            color: #555; 
+            background: #fff; 
+            padding: 8px; 
+            border: 1px dashed #ccc;
+            border-radius: 4px; 
+            word-break: break-all; 
+            margin: 10px 0; 
+            font-family: monospace;
+        }
+        
+        /* --- Botão WhatsApp --- */
+        .btn-copy { 
+            background: #25D366; 
+            color: white; 
+            border: none; 
+            padding: 8px 10px; 
+            border-radius: 4px; 
+            cursor: pointer; 
+            font-size: 13px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            width: 100%; 
+            font-weight: bold;
+            transition: 0.2s;
+        }
+        .btn-copy:hover { background: #128C7E; }
+    </style>
+</head>
+<body>
+
+    <div id="sidebar">
+        <h2>🚚 Nova Ordem de Serviço</h2>
+        
+        <form action="/gerar_ordem" method="POST">
+            <div class="form-control">
+                <label>Nome do Motorista:</label>
+                <input type="text" name="motorista" placeholder="Ex: Carlos Silva" required>
+            </div>
+            <div class="form-control">
+                <label>Placa / Veículo:</label>
+                <input type="text" name="placa" placeholder="Ex: ABC-1234" required>
+            </div>
+            <button type="submit" class="btn-gerar">Gerar Link de Rastreio</button>
+        </form>
+
+        <h3>Frota Ativa</h3>
+        <div id="lista-frota">
+            <p style="text-align: center; color: #999; font-size: 12px;">Nenhuma ordem ativa no momento.</p>
+        </div>
+    </div>
+
+    <div id="mapa"></div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <script>
+        // 1. Inicializa o Mapa (Focado no Brasil)
+        var map = L.map('mapa').setView([-15.7801, -47.9292], 4);
+        
+        // Adiciona o visual do mapa (OpenStreetMap)
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap'
+        }).addTo(map);
+
+        var markers = {}; // Guarda os pinos dos caminhões
+
+        // 2. Função para Copiar Mensagem Pronta
+        function copiarZap(link, nome) {
+            const msg = `Olá ${nome}, segue o link para confirmação de início de rota e liberação de carga: ${link}`;
+            
+            navigator.clipboard.writeText(msg).then(() => {
+                alert("✅ Mensagem copiada com sucesso!\n\nAgora é só colar no WhatsApp do motorista.");
+            }).catch(err => {
+                alert("Erro ao copiar. Tente selecionar e copiar manualmente.");
+            });
+        }
+
+        // 3. Função que busca os dados do Python a cada 4 segundos
+        function atualizar() {
+            fetch('/api/frota')
+            .then(r => r.json())
+            .then(frota => {
+                const div = document.getElementById('lista-frota');
+                
+                // Se não tiver frota, não faz nada
+                if (Object.keys(frota).length === 0) {
+                    div.innerHTML = '<p style="text-align: center; color: #999; font-size: 12px;">Nenhuma ordem ativa.</p>';
+                    return;
+                }
+
+                div.innerHTML = ""; // Limpa a lista para redesenhar
+
+                for (const [id, dados] of Object.entries(frota)) {
+                    
+                    // Pega o link que o Python gerou (pode ser o curto ou o longo)
+                    const linkFinal = dados.link ? dados.link : "Gerando link...";
+                    
+                    // Define se o card fica verde ou cinza
+                    const ativo = dados.status === "Em Trânsito" ? "ativo" : "";
+
+                    // Monta o HTML do cartão
+                    div.innerHTML += `
+                        <div class="card ${ativo}">
+                            <span class="status-badge">${dados.status}</span><br>
+                            <strong>${dados.motorista}</strong> <span style="color:#666">(${dados.placa})</span><br>
+                            
+                            <div class="link-area">${linkFinal}</div>
+                            
+                            <button class="btn-copy" onclick="copiarZap('${linkFinal}', '${dados.motorista}')">
+                                📋 Copiar Mensagem WhatsApp
+                            </button>
+
+                            <div style="margin-top:5px; font-size:10px; color:#888;">
+                                Último sinal: ${dados.ultimo_visto}
+                            </div>
+                        </div>
+                    `;
+
+                    // Atualiza o Mapa se tiver coordenadas
+                    if(dados.lat && dados.lon) {
+                        if(markers[id]) {
+                            // Se o pino já existe, move ele
+                            markers[id].setLatLng([dados.lat, dados.lon]);
+                        } else {
+                            // Se não existe, cria um novo
+                            markers[id] = L.marker([dados.lat, dados.lon])
+                                .addTo(map)
+                                .bindPopup(`<b>${dados.motorista}</b><br>${dados.placa}<br>Status: ${dados.status}`);
+                        }
+                    }
+                }
+            });
+        }
+
+        // Atualiza a cada 4 segundos
+        setInterval(atualizar, 4000);
+        atualizar(); // Roda a primeira vez imediatamente
+    </script>
+</body>
+</html>
