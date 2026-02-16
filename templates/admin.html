@@ -13,7 +13,238 @@
             margin: 0; 
             display: flex; 
             height: 100vh; 
-            background: #f0f2f5; 
+            background: #f0f2f5; <!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Logístico - Admin</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; display: flex; height: 100vh; background: #f1f5f9; }
+        
+        /* Barra Lateral */
+        #sidebar { width: 380px; background: white; border-right: 1px solid #cbd5e1; overflow-y: auto; display: flex; flex-direction: column; box-shadow: 4px 0 15px rgba(0,0,0,0.05); z-index: 1000; }
+        #sidebar-header { padding: 25px; background: #0f172a; color: white; }
+        #sidebar-content { padding: 20px; }
+
+        /* Mapa */
+        #mapa { flex: 1; height: 100%; z-index: 1; }
+
+        /* Formulário */
+        .form-group { margin-bottom: 15px; }
+        label { font-size: 11px; font-weight: 700; color: #64748b; margin-bottom: 6px; display: block; text-transform: uppercase; letter-spacing: 0.5px; }
+        input[type="text"] { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box; font-size: 14px; transition: 0.2s; }
+        input[type="text"]:focus { border-color: #3b82f6; outline: none; }
+
+        button.btn-primary { background: #3b82f6; color: white; width: 100%; padding: 14px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 14px; transition: 0.2s; }
+        button.btn-primary:hover { background: #2563eb; }
+
+        /* CARD DO MOTORISTA */
+        .telemetry-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        .telemetry-card:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+
+        .card-header {
+            background: #f8fafc;
+            padding: 12px 15px;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .motorista-nome { font-weight: 700; color: #1e293b; font-size: 15px; }
+        .placa-badge { background: #334155; color: #fff; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; }
+
+        .card-body { padding: 15px; }
+
+        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; font-size: 13px; color: #64748b; margin-bottom: 15px; }
+        .info-value { color: #0f172a; font-weight: 600; display: block; margin-top: 2px; }
+
+        /* Campo de Link */
+        .link-display {
+            background: #f1f5f9;
+            border: 1px dashed #94a3b8;
+            padding: 8px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 11px;
+            color: #334155;
+            width: 100%;
+            box-sizing: border-box;
+            margin-bottom: 10px;
+            cursor: text;
+        }
+
+        /* Área de Botões */
+        .action-bar { display: flex; gap: 5px; padding: 10px; background: #f8fafc; border-top: 1px solid #e2e8f0; }
+
+        .btn-zap { 
+            flex: 2;
+            background: #22c55e; color: white; border: none; padding: 10px; 
+            border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold; 
+            display: flex; align-items: center; justify-content: center; gap: 5px;
+        }
+        .btn-zap:hover { background: #16a34a; }
+
+        /* BOTÃO DE ZOOM (NOVO) */
+        .btn-locate {
+            flex: 1;
+            background: #64748b; color: white; border: none; padding: 10px;
+            border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .btn-locate:hover { background: #475569; }
+
+        /* Status */
+        .status-dot { height: 8px; width: 8px; background-color: #cbd5e1; border-radius: 50%; display: inline-block; margin-right: 6px; }
+        .online { background-color: #22c55e; box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.2); animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+
+    </style>
+</head>
+<body>
+
+    <div id="sidebar">
+        <div id="sidebar-header">
+            <h2 style="margin:0; font-size: 18px; letter-spacing: 1px;">TRACKING SYSTEM</h2>
+            <small style="opacity: 0.7;">Monitoramento em Tempo Real</small>
+        </div>
+        
+        <div id="sidebar-content">
+            <form action="/gerar_ordem" method="POST">
+                <div class="form-group">
+                    <label>Motorista</label>
+                    <input type="text" name="motorista" placeholder="Nome Completo" required>
+                </div>
+                <div class="form-group">
+                    <label>Placa</label>
+                    <input type="text" name="placa" placeholder="ABC-1234" required>
+                </div>
+                <button type="submit" class="btn-primary">GERAR RASTREIO</button>
+            </form>
+
+            <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 25px 0;">
+            
+            <div id="lista-frota">
+                <p style="text-align: center; color: #94a3b8; font-size: 13px;">Carregando frota...</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="mapa"></div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        // Inicializa o mapa com visão do Brasil
+        var map = L.map('mapa').setView([-14.2350, -51.9253], 4);
+        
+        // Camada do Mapa (Satélite Híbrido ficaria legal, mas vamos manter o Clean por enquanto)
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { 
+            attribution: '© OpenStreetMap' 
+        }).addTo(map);
+
+        var markers = {};
+        var primeiraVez = true; // Controle para zoom automático inicial
+
+        function copiarZap(link, nome) {
+            const msg = `Olá ${nome}, favor confirmar início de rota: ${link}`;
+            navigator.clipboard.writeText(msg).then(() => alert("✅ Link copiado!")).catch(() => alert("Erro ao copiar."));
+        }
+
+        // --- FUNÇÃO DE ZOOM (NOVA) ---
+        function focarNoCaminhao(lat, lon) {
+            // O número 16 no final é o nível de zoom (quanto maior, mais perto)
+            // flyTo faz uma animação suave de voo até o local
+            map.flyTo([lat, lon], 17, {
+                animate: true,
+                duration: 1.5 // Duração do voo em segundos
+            });
+        }
+
+        function atualizar() {
+            fetch('/api/frota').then(r => r.json()).then(frota => {
+                const div = document.getElementById('lista-frota');
+                
+                // Salva a posição do scroll para não pular quando atualizar
+                const scrollTop = div.scrollTop; 
+                div.innerHTML = "";
+
+                if (Object.keys(frota).length === 0) {
+                    div.innerHTML = "<p style='text-align:center;color:#94a3b8;'>Nenhum veículo rastreado.</p>";
+                    return;
+                }
+
+                for (const [id, dados] of Object.entries(frota)) {
+                    const onlineClass = dados.status.includes("Online") ? "online" : "";
+                    
+                    // Se temos GPS, habilita o botão de localizar
+                    const botaoLocalizar = dados.lat 
+                        ? `<button class="btn-locate" onclick="focarNoCaminhao(${dados.lat}, ${dados.lon})">🔍 LOCALIZAR</button>` 
+                        : `<button class="btn-locate" style="opacity:0.5; cursor:not-allowed;">📡 AGUARDANDO</button>`;
+
+                    div.innerHTML += `
+                        <div class="telemetry-card">
+                            <div class="card-header">
+                                <div><span class="status-dot ${onlineClass}"></span><span class="motorista-nome">${dados.motorista}</span></div>
+                                <span class="placa-badge">${dados.placa}</span>
+                            </div>
+                            
+                            <div class="card-body">
+                                <div class="info-grid">
+                                    <div><label>Status</label><span class="info-value" style="color:${onlineClass ? '#16a34a' : '#64748b'}">${dados.status}</span></div>
+                                    <div><label>Visto às</label><span class="info-value">${dados.ultimo_visto}</span></div>
+                                    <div><label>Precisão</label><span class="info-value">${dados.precisao || '-'}</span></div>
+                                    <div><label>Velocidade</label><span class="info-value">${dados.velocidade ? Math.round(dados.velocidade * 3.6) + ' km/h' : '0 km/h'}</span></div>
+                                </div>
+
+                                <label>Link de Acesso:</label>
+                                <input type="text" class="link-display" value="${dados.link}" readonly onclick="this.select()">
+                            </div>
+
+                            <div class="action-bar">
+                                <button class="btn-zap" onclick="copiarZap('${dados.link}', '${dados.motorista}')">📱 WHATSAPP</button>
+                                ${botaoLocalizar}
+                            </div>
+                        </div>
+                    `;
+
+                    // Atualiza Pinos
+                    if(dados.lat) {
+                        if(markers[id]) {
+                            markers[id].setLatLng([dados.lat, dados.lon]);
+                        } else {
+                            // Cria marcador novo
+                            markers[id] = L.marker([dados.lat, dados.lon]).addTo(map)
+                                .bindPopup(`<b>${dados.motorista}</b><br>${dados.placa}`);
+                            
+                            // SE FOR O PRIMEIRO SINAL RECEBIDO, JÁ DÁ ZOOM AUTOMÁTICO
+                            if (primeiraVez) {
+                                focarNoCaminhao(dados.lat, dados.lon);
+                                primeiraVez = false;
+                            }
+                        }
+                    }
+                }
+                // Restaura o scroll
+                // div.scrollTop = scrollTop;
+            });
+        }
+        
+        setInterval(atualizar, 3000);
+        atualizar();
+    </script>
+</body>
+</html>
         }
         
         /* --- Barra Lateral --- */
@@ -234,4 +465,5 @@
         atualizar(); // Roda a primeira vez imediatamente
     </script>
 </body>
+
 </html>
