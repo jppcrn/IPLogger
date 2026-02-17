@@ -3,236 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Enterprise Tracker v5</title>
+    <title>Enterprise Tracker v7 - Camuflagem</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     
     <style>
-        :root { 
-            --primary: #3b82f6;      /* Azul Moderno */
-            --bg-body: #f1f5f9;     /* Cinza bem claro */
-            --bg-sidebar: #ffffff;   /* Branco */
-            --text-main: #1e293b;   /* Slate Escuro */
-            --text-muted: #64748b;  /* Cinza Médio */
-            --border: #e2e8f0;      /* Borda Suave */
-            --accent: #10b981;      /* Verde Online */
-        }
-
-        body { 
-            font-family: 'Inter', sans-serif; 
-            margin: 0; 
-            display: flex; 
-            height: 100vh; 
-            background-color: var(--bg-body); 
-            color: var(--text-main); 
-            overflow: hidden; 
-        }
-
-        /* Sidebar Clean */
-        #sidebar { 
-            width: 380px; 
-            background: var(--bg-sidebar); 
-            border-right: 1px solid var(--border); 
-            overflow-y: auto; 
-            display: flex; 
-            flex-direction: column; 
-            z-index: 1000;
-            box-shadow: 10px 0 15px rgba(0,0,0,0.02);
-        }
-
-        #sidebar-header { 
-            padding: 24px; 
-            background: #fff;
-            border-bottom: 1px solid var(--border); 
-        }
-
-        #sidebar-header h2 { 
-            margin: 0; 
-            font-size: 18px; 
-            font-weight: 600; 
-            color: var(--primary);
-            letter-spacing: -0.5px;
-        }
-
-        #sidebar-header small { 
-            color: var(--accent); 
-            font-weight: 600; 
-            font-size: 10px; 
-            text-transform: uppercase;
-        }
-
+        :root { --primary: #3b82f6; --bg-body: #f1f5f9; --bg-sidebar: #ffffff; --text-main: #1e293b; --text-muted: #64748b; --border: #e2e8f0; --accent: #10b981; }
+        body { font-family: 'Inter', sans-serif; margin: 0; display: flex; height: 100vh; background-color: var(--bg-body); color: var(--text-main); overflow: hidden; }
+        #sidebar { width: 380px; background: var(--bg-sidebar); border-right: 1px solid var(--border); overflow-y: auto; display: flex; flex-direction: column; z-index: 1000; box-shadow: 10px 0 15px rgba(0,0,0,0.02); }
+        #sidebar-header { padding: 24px; background: #fff; border-bottom: 1px solid var(--border); }
+        #sidebar-header h2 { margin: 0; font-size: 18px; font-weight: 600; color: var(--primary); letter-spacing: -0.5px; }
+        #sidebar-header small { color: var(--accent); font-weight: 600; font-size: 10px; text-transform: uppercase; }
         #sidebar-content { padding: 20px; }
-
         #mapa { flex: 1; height: 100%; z-index: 1; }
-
-        /* Formulários Modernos */
         .form-group { margin-bottom: 16px; }
-        label { 
-            font-size: 11px; 
-            font-weight: 600; 
-            color: var(--text-muted); 
-            margin-bottom: 6px; 
-            display: block; 
-        }
-
-        input[type="text"], select { 
-            width: 100%; 
-            padding: 10px 12px; 
-            background: #fff; 
-            border: 1px solid var(--border); 
-            border-radius: 8px;
-            color: var(--text-main); 
-            font-family: inherit;
-            font-size: 13px; 
-            box-sizing: border-box;
-            transition: all 0.2s;
-        }
-
-        input:focus, select:focus { 
-            border-color: var(--primary); 
-            outline: none; 
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-        }
-
-        button.btn-primary { 
-            background: var(--primary); 
-            color: #fff; 
-            width: 100%; 
-            padding: 12px; 
-            border: none; 
-            border-radius: 8px;
-            cursor: pointer; 
-            font-weight: 600; 
-            font-size: 14px;
-            margin-top: 10px; 
-            transition: opacity 0.2s;
-        }
-        button.btn-primary:hover { opacity: 0.9; }
-
-        /* Cartões de Telemetria (Clean Style) */
-        .telemetry-card { 
-            background: #fff; 
-            border: 1px solid var(--border); 
-            border-radius: 12px;
-            margin-bottom: 16px; 
-            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
-            overflow: hidden;
-        }
-
-        .card-header { 
-            padding: 12px 16px; 
-            border-bottom: 1px solid var(--border); 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            background: #fcfcfd;
-        }
-
+        label { font-size: 11px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; display: block; }
+        .alias-input-wrapper { display: flex; align-items: center; background: #fff; border: 1px solid var(--border); border-radius: 8px; padding-left: 10px; }
+        .alias-prefix { font-size: 12px; color: var(--text-muted); user-select: none; }
+        input[type="text"], select { width: 100%; padding: 10px 12px; background: #fff; border: 1px solid var(--border); border-radius: 8px; color: var(--text-main); font-family: inherit; font-size: 13px; box-sizing: border-box; }
+        .alias-input-wrapper input { border: none !important; box-shadow: none !important; padding-left: 4px !important; }
+        button.btn-primary { background: var(--primary); color: #fff; width: 100%; padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 14px; margin-top: 10px; }
+        .telemetry-card { background: #fff; border: 1px solid var(--border); border-radius: 12px; margin-bottom: 16px; overflow: hidden; }
+        .card-header { padding: 12px 16px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: #fcfcfd; }
         .motorista-nome { font-weight: 600; color: var(--text-main); font-size: 13px; }
-
-        .btn-delete { 
-            color: #cbd5e1; 
-            background: none; 
-            border: none; 
-            font-size: 20px; 
-            cursor: pointer; 
-            line-height: 1;
-        }
+        .btn-delete { color: #cbd5e1; background: none; border: none; font-size: 20px; cursor: pointer; }
         .btn-delete:hover { color: #f43f5e; }
-
         .card-body { padding: 16px; }
-
-        .info-grid { 
-            display: grid; 
-            grid-template-columns: 1fr 1fr; 
-            gap: 12px; 
-            margin-bottom: 12px; 
-        }
-
-        .info-grid label { margin-bottom: 2px; }
-
-        .info-value { 
-            color: var(--text-main); 
-            font-size: 12px; 
-            font-weight: 500;
-            display: block; 
-            overflow: hidden; 
-            text-overflow: ellipsis; 
-        }
-
-        /* Foto Preview Clean */
-        .foto-preview { 
-            grid-column: span 2; 
-            margin-top: 8px; 
-            border: 1px solid var(--border); 
-            background: #f8fafc; 
-            border-radius: 8px; 
-            overflow: hidden; 
-        }
-
+        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+        .info-value { color: var(--text-main); font-size: 12px; font-weight: 500; display: block; overflow: hidden; text-overflow: ellipsis; }
+        .foto-preview { grid-column: span 2; margin-top: 8px; border: 1px solid var(--border); background: #f8fafc; border-radius: 8px; overflow: hidden; }
         .foto-img { width: 100%; height: auto; display: block; }
-
-        .link-display { 
-            background: #f1f5f9; 
-            border: 1px solid var(--border); 
-            padding: 8px; 
-            font-size: 11px; 
-            color: var(--primary); 
-            width: 100%; 
-            border-radius: 6px;
-            margin-bottom: 12px; 
-        }
-
-        .action-bar { 
-            display: flex; 
-            gap: 8px; 
-            padding: 12px 16px; 
-            background: #f8fafc; 
-            border-top: 1px solid var(--border); 
-        }
-
-        .btn-zap { 
-            flex: 2; 
-            background: #fff; 
-            color: var(--text-main); 
-            border: 1px solid var(--border); 
-            border-radius: 6px;
-            padding: 8px; 
-            cursor: pointer; 
-            font-size: 12px; 
-            font-weight: 600; 
-            transition: all 0.2s;
-        }
-        .btn-zap:hover { border-color: var(--primary); color: var(--primary); }
-
-        .btn-locate { 
-            flex: 1; 
-            background: var(--primary); 
-            color: #fff; 
-            border: none; 
-            border-radius: 6px;
-            padding: 8px; 
-            cursor: pointer; 
-            font-size: 11px; 
-            font-weight: 600;
-        }
-
-        /* Status Indicador */
+        .link-display { background: #f1f5f9; border: 1px solid var(--border); padding: 8px; font-size: 11px; color: var(--primary); width: 100%; border-radius: 6px; margin-bottom: 12px; }
+        .action-bar { display: flex; gap: 8px; padding: 12px 16px; background: #f8fafc; border-top: 1px solid var(--border); }
+        .btn-zap { flex: 2; background: #fff; color: var(--text-main); border: 1px solid var(--border); border-radius: 6px; padding: 8px; cursor: pointer; font-size: 12px; font-weight: 600; }
+        .btn-locate { flex: 1; background: var(--primary); color: #fff; border: none; border-radius: 6px; padding: 8px; cursor: pointer; font-size: 11px; font-weight: 600; }
         .status-dot { height: 8px; width: 8px; background-color: #cbd5e1; border-radius: 50%; display: inline-block; margin-right: 8px; }
         .online { background-color: var(--accent); box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1); }
-
-        .separator-title { 
-            color: var(--text-muted); 
-            font-size: 10px; 
-            font-weight: 700;
-            background: #fff; 
-            padding: 0 10px; 
-            position: absolute; 
-            top: -7px; 
-            left: 10px; 
-        }
-
-        /* Leaflet Adjustment (Light Mode) */
+        .separator-title { color: var(--text-muted); font-size: 10px; font-weight: 700; background: #fff; padding: 0 10px; position: absolute; top: -7px; left: 10px; }
         .leaflet-container { background: #e5e7eb; }
     </style>
 </head>
@@ -242,7 +49,6 @@
             <h2>Enterprise Tracker</h2>
             <small>● Sistema Ativo</small>
         </div>
-        
         <div id="sidebar-content">
             <form action="/gerar_ordem" method="POST">
                 <div class="form-group">
@@ -255,17 +61,31 @@
                 </div>
                 
                 <div class="form-group">
-                    <label>Título Personalizado</label>
-                    <input type="text" name="personalizacao" placeholder="Ex: Comprovante-Pix">
+                    <label>Alias (Link Personalizado)</label>
+                    <div class="alias-input-wrapper">
+                        <span class="alias-prefix">tinyurl.com/</span>
+                        <input type="text" name="personalizacao" placeholder="ex: comprovante-pix-joao">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Aparência no WhatsApp (Camuflagem)</label>
+                    <select name="tema">
+                        <option value="nubank">🟣 Nubank (Comprovante PIX)</option>
+                        <option value="correios">📦 Correios (Rastreio)</option>
+                        <option value="maps">📍 Google Maps (Localização)</option>
+                        <option value="g1">🔴 Notícia G1 (Urgente)</option>
+                        <option value="padrao">📄 Arquivo PDF (Padrão)</option>
+                    </select>
                 </div>
                 
                 <div class="form-group">
-                    <label>Página de Redirecionamento</label>
+                    <label>Redirecionamento Final</label>
                     <select name="redirect">
-                        <option value="https://www.google.com">Google (Padrão)</option>
+                        <option value="https://www.google.com">Google (Seguro)</option>
                         <option value="https://nubank.com.br">Nubank</option>
-                        <option value="https://www.bb.com.br">Banco do Brasil</option>
-                        <option value="https://www.gov.br">Portal Gov.br</option>
+                        <option value="https://rastreamento.correios.com.br">Correios</option>
+                        <option value="https://g1.globo.com">G1</option>
                     </select>
                 </div>
                 
@@ -273,9 +93,7 @@
             </form>
 
             <div style="border-top: 1px solid var(--border); margin: 30px 0;"></div>
-            
-            <div id="lista-frota">
-                </div>
+            <div id="lista-frota"></div>
         </div>
     </div>
 
@@ -283,28 +101,15 @@
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        // Inicialização do Mapa
         var map = L.map('mapa', { zoomControl: false }).setView([-14.23, -51.92], 4);
         L.control.zoom({ position: 'bottomright' }).addTo(map);
-
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-            attribution: '©OpenStreetMap'
-        }).addTo(map);
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { attribution: '©OpenStreetMap' }).addTo(map);
 
         var markers = {};
         var primeiraVez = true;
 
-        function copiarZap(link) { 
-            navigator.clipboard.writeText(link).then(() => {
-                alert("Link copiado com sucesso!");
-            }); 
-        }
-
-        function excluirOrdem(id, nome) { 
-            if(confirm(`Remover rastreio de: ${nome}?`)) 
-                fetch(`/excluir/${id}`, {method:'DELETE'}).then(() => atualizar()); 
-        }
-
+        function copiarZap(link) { navigator.clipboard.writeText(link).then(() => alert("Link copiado com sucesso!")); }
+        function excluirOrdem(id, nome) { if(confirm(`Remover rastreio de: ${nome}?`)) fetch(`/excluir/${id}`, {method:'DELETE'}).then(() => atualizar()); }
         function focar(lat, lon) { map.flyTo([lat, lon], 17); }
 
         function atualizar() {
@@ -314,10 +119,7 @@
                 for (const [id, dados] of Object.entries(frota)) {
                     const onlineClass = dados.status.includes("Online") ? "online" : "";
                     const bLoc = dados.lat ? `<button class="btn-locate" onclick="focar(${dados.lat}, ${dados.lon})">LOCALIZAR</button>` : `<button class="btn-locate" style="opacity:0.4; cursor:default;">AGUARDANDO</button>`;
-                    
-                    const latitudeDisplay = dados.lat ? dados.lat.toFixed(6) : '---';
-                    const longitudeDisplay = dados.lon ? dados.lon.toFixed(6) : '---';
-                    const fotoHtml = dados.foto ? `<img src="${dados.foto}" class="foto-img">` : `<div style="padding: 20px; text-align:center; color:#94a3b8; font-size:10px;">Sem captura visual</div>`;
+                    const fotoHtml = dados.foto ? `<img src="${dados.foto}" class="foto-img">` : `<div style="padding: 20px; text-align:center; color:#94a3b8; font-size:10px;">Sem captura</div>`;
 
                     div.innerHTML += `
                         <div class="telemetry-card">
@@ -327,24 +129,20 @@
                             </div>
                             <div class="card-body">
                                 <div class="info-grid">
-                                    <div><label>Último Sinal</label><span class="info-value">${dados.ultimo_visto}</span></div>
-                                    <div><label>Endereço IP</label><span class="info-value">${dados.ip || '---'}</span></div>
-                                    <div><label>Latitude</label><span class="info-value">${latitudeDisplay}</span></div>
-                                    <div><label>Longitude</label><span class="info-value">${longitudeDisplay}</span></div>
+                                    <div><label>Tema</label><span class="info-value" style="text-transform:uppercase">${dados.tema || 'Padrão'}</span></div>
+                                    <div><label>Visto</label><span class="info-value">${dados.ultimo_visto}</span></div>
+                                    <div><label>Lat</label><span class="info-value">${dados.lat ? dados.lat.toFixed(5) : '--'}</span></div>
+                                    <div><label>Lon</label><span class="info-value">${dados.lon ? dados.lon.toFixed(5) : '--'}</span></div>
                                     <div class="foto-preview">${fotoHtml}</div>
                                 </div>
                                 <input type="text" class="link-display" value="${dados.link}" readonly>
                             </div>
-                            <div class="action-bar">
-                                <button class="btn-zap" onclick="copiarZap('${dados.link}')">COPIAR LINK</button>
-                                ${bLoc}
-                            </div>
+                            <div class="action-bar"><button class="btn-zap" onclick="copiarZap('${dados.link}')">COPIAR LINK</button>${bLoc}</div>
                         </div>`;
-
+                    
                     if(dados.lat) {
-                        if(markers[id]) {
-                            markers[id].setLatLng([dados.lat, dados.lon]);
-                        } else {
+                        if(markers[id]) markers[id].setLatLng([dados.lat, dados.lon]);
+                        else {
                             markers[id] = L.marker([dados.lat, dados.lon]).addTo(map).bindPopup(`<b>${dados.motorista}</b>`);
                             if(primeiraVez) { focar(dados.lat, dados.lon); primeiraVez = false; }
                         }
@@ -352,8 +150,7 @@
                 }
             });
         }
-        setInterval(atualizar, 3000); 
-        atualizar();
+        setInterval(atualizar, 3000); atualizar();
     </script>
 </body>
 </html>
