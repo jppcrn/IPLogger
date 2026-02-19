@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Comprovante de Transferência - Nubank</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background-color: #f5f5f5;
+      margin: 0;
+      padding: 20px;
+      color: #333;
+      line-height: 1.4;
+    }
+    .comprovante {
+      max-width: 420px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      overflow: hidden;
+    }
+    .header {
+      background: #820ad1;
+      color: white;
+      padding: 20px 24px;
+      text-align: center;
+      position: relative;
+    }
+    .logo {
+      font-size: 28px;
+      font-weight: bold;
+      margin: 0;
+    }
+    .check {
+      font-size: 40px;
+      margin-bottom: 8px;
+    }
+    .titulo {
+      font-size: 20px;
+      font-weight: 600;
+      margin: 8px 0 4px;
+    }
+    .data-hora {
+      font-size: 14px;
+      opacity: 0.9;
+    }
+    .conteudo {
+      padding: 24px;
+    }
+    .bloco {
+      margin-bottom: 24px;
+    }
+    .bloco:last-child {
+      margin-bottom: 0;
+    }
+    .titulo-bloco {
+      color: #820ad1;
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    td {
+      padding: 10px 0;
+      vertical-align: top;
+    }
+    .label {
+      width: 140px;
+      color: #666;
+      font-size: 14px;
+    }
+    .valor {
+      font-weight: 500;
+      color: #111;
+      font-size: 15px;
+      word-break: break-all;
+    }
+    .valor-destaque {
+      font-size: 28px;
+      font-weight: 700;
+      color: #111;
+      text-align: center;
+      margin: 16px 0;
+    }
+    .linha-total {
+      border-top: 1px solid #eee;
+      margin-top: 8px;
+      padding-top: 12px;
+    }
+    .rodape {
+      background: #f8f8f8;
+      padding: 20px 24px;
+      font-size: 13px;
+      color: #555;
+      text-align: center;
+      border-top: 1px solid #eee;
+    }
+    .id-transacao {
+      font-family: monospace;
+      font-size: 13px;
+      word-break: break-all;
+      margin: 12px 0;
+      color: #444;
+    }
+    .ajuda {
+      margin-top: 16px;
+      font-size: 14px;
+    }
+    .ajuda a {
+      color: #820ad1;
+      text-decoration: none;
+      font-weight: 500;
+    }
+  </style>
+</head>
+<body>
+
+<div class="comprovante">
+
+  <div class="header">
+    <div class="check">✔</div>
+    <h1 class="logo">nu</h1>
+    <div class="titulo">Comprovante de transferência</div>
+    <div class="data-hora">12 FEV 2026 - 08:01:15</div>
+  </div>
+
+  <div class="conteudo">
+
+    <div class="bloco">
+      <div class="titulo-bloco">Tipo de transferência</div>
+      <div class="valor">Pix</div>
+    </div>
+
+    <div class="bloco">
+      <div class="titulo-bloco">ID da transação</div>
+      <div class="valor">E18236120202602121101s059567b1ea</div>
+    </div>
+
+    <div class="bloco">
+      <div class="titulo-bloco">Destino</div>
+      <table>
+        <tr>
+          <td class="label">Nome</td>
+          <td class="valor">Tatiane Carla Morais de Oliveira</td>
+        </tr>
+        <tr>
+          <td class="label">Instituição</td>
+          <td class="valor">NU PAGAMENTOS - IP</td>
+        </tr>
+        <tr>
+          <td class="label">Agência</td>
+          <td class="valor">0001</td>
+        </tr>
+        <tr>
+          <td class="label">Conta</td>
+          <td class="valor">5266610-8</td>
+        </tr>
+      </table>
+    </div>
+
+    <div class="bloco">
+      <div class="titulo-bloco">Origem</div>
+      <table>
+        <tr>
+          <td class="label">Nome</td>
+          <td class="valor">João Paulo Morais de Oliveira</td>
+        </tr>
+        <tr>
+          <td class="label">Instituição</td>
+          <td class="valor">NU PAGAMENTOS - IP</td>
+        </tr>
+        <tr>
+          <td class="label">Agência</td>
+          <td class="valor">0001</td>
+        </tr>
+        <tr>
+          <td class="label">Conta</td>
+          <td class="valor">436888728-7</td>
+        </tr>
+        <tr>
+          <td class="label">CPF</td>
+          <td class="valor">...065.474...</td>
+        </tr>
+      </table>
+    </div>
+
+    <div class="bloco linha-total">
+      <div class="titulo-bloco">Valor</div>
+      <div class="valor-destaque">R$ 250,00</div>
+    </div>
+
+    <div class="bloco linha-total">
+      <div class="id-transacao">
+        ID da transação:<br>
+        E18236120202602121101s059567b1ea
+      </div>
+    </div>
+
+  </div>
+
+  <div class="rodape">
+    <div>Nu Pagamentos S.A. - Instituição de Pagamento</div>
+    <div>CNPJ 18.236.120/0001-58</div>
+    
+    <div class="ajuda">
+      Estamos aqui para ajudar se você tiver alguma dúvida.<br>
+      <a href="#">Me ajuda →</a>
+    </div>
+    
+    <div style="margin-top:16px;">
+      Ouvidoria: 0800 887 0463 ou demais canais em<br>
+      nubank.com.br/contatos#ouvidoria<br>
+      (Atendimento das 8h às 18h em dias úteis)
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>
